@@ -7,7 +7,6 @@ from dataclasses import dataclass
 from email.message import EmailMessage
 from typing import Optional
 
-import google.auth
 import httpx
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
@@ -168,19 +167,35 @@ def create_pre_class_email(virtual_class: VirtualClassInfo, zoom_info) -> EmailM
 
     message["From"] = "instructor19@nypl.org"
     message["To"] = "techconnect@nypl.org"
-    message["Bcc"] = [
-        "gduser1@workspacesamples.dev",
-        "test1@example.com",
-        "test2@example.com",
-    ]
-    message["Subject"] = "Automated draft"
+    message["Bcc"] = virtual_class.registration_emails
+    message["Subject"] = f"TechConnect: Join Link for {virtual_class.class_name}"
 
     message.set_content("This is fallback content,\n\nHello world!\n\nBest,\nKang")
     message.add_alternative(
-        """\
+        f"""\
         <html>
-          <body>
-            <p>This is an <b>HTML</b> email</p>
+          <body style="margin: 0; padding: 0; line-height: 1.2; font-size: 13.5px;">
+            <p style="margin: 0; padding: 0;">Thank you for registering for TechConnect's <b>{virtual_class.class_name}</b> virtual class taking place today, <b>{virtual_class.date}</b> <b>{virtual_class.day}</b> at <b>{virtual_class.start_time}</b>!</p>
+            <p>The Library uses Zoom to conduct virtual classes. The Library does not own Zoom. We want you to understand how you and the Library use this service. Read the <a href="https://www.nypl.org/help/about-nypl/legal-notices/privacy-policy">Library’s Privacy Policy</a>, especially the section "Third-Party Library Services Providers."</p>
+            <p style="margin: 0; padding: 0;"><b>To join the class, click on the following link or copy & paste it into your browser:</b></p>
+            <p style="margin: 0; padding: 0;">zoom_link</p>
+            <br>
+            <p style="margin: 0; padding: 0;">Meeting ID: m_id</p>
+            <p style="margin: 0; padding: 0;">Passcode: p_code</p>
+            <p><b>Arrival to class on time is mandatory. Entrance into a class will not be permitted 15 minutes after class begins.</b></p>
+            <br>
+            <p style="margin: 0; padding: 0;"><b>USING THE CHAT BOX</b></p>
+            <p style="margin: 0; padding: 0;">To communicate with the instructor and the rest of the class:</p>
+            <ul>
+                <li>Click the Chat icon in the meeting control bar at the bottom of the window.</li>
+                <li>Once the chat window is open on the right side of the window, click on a gray box at the bottom of the sidebar where it says "Type message here."</li>
+                <li>Type your question or comment.</li>
+                <li>Hit the "Enter" or "Return" key on your keyboard to submit your question or comment.</li>
+            </ul>
+            <br>
+            <p style="color: #D0343A;">Please note that the entire group will be able to see your question or comment so be careful not to include any personal information in your messages.</p>
+            <p style="margin: 0; padding: 0;">See you soon!</p>
+            <p style="margin: 0; padding: 0;">Your friends at <span style="color: #799A05;">Tech</span><span style="color: #0071CE;">Connect</span></p>
           </body>
         </html>
         """,
@@ -191,7 +206,38 @@ def create_pre_class_email(virtual_class: VirtualClassInfo, zoom_info) -> EmailM
 
 
 def create_post_class_email(virtual_class: VirtualClassInfo, zoom_info) -> EmailMessage:
-    raise
+    message = EmailMessage()
+
+    message["From"] = "instructor19@nypl.org"
+    message["To"] = "techconnect@nypl.org"
+    message["Bcc"] = virtual_class.registration_emails
+    message["Subject"] = (
+        f"TechConnect: {virtual_class.class_name} Class Handout, Practice Files & Survey"
+    )
+
+    message.set_content("This is fallback content,\n\nHello world!\n\nBest,\nKang")
+    message.add_alternative(
+        f"""\
+        <html>
+          <body style="margin: 0; padding: 0; line-height: 1.2; font-size: 13.5px;">
+            <p style="margin: 0; padding: 0;">Hello friend,</p>
+            <p>Thank you so much for attending {virtual_class.class_name}. Attached is the PDF handout and the files we worked on in class.</p>
+            <p style="margin: 0; padding: 0;">Handout: </p>
+            <p style="margin: 0; padding: 0;">Class File: </p>
+            <br>
+            <p>Directly below is a link to a survey that lets us know how we're doing and any additional feedback you might have. <b>Please take some time to fill out the survey in full so that we can learn how to better serve you.</b></p>
+            <br>
+            <p style="margin: 0; padding: 0;"><a href="https://docs.google.com/forms/d/e/1FAIpQLSeRoFsj9kC436jyBuImwv2QToGSYYZDo1SygTEnsQ-k3ozHng/viewform">Click here to complete our online class survey.</a></p>
+            <br>
+            <p style="margin: 0; padding: 0;">Kind regards,</p>
+            <p style="margin: 0; padding: 0;">Your friends at <span style="color: #799A05;">Tech</span><span style="color: #0071CE;">Connect</span></p>
+          </body>
+        </html>
+        """,
+        subtype="html",
+    )
+
+    return message
 
 
 def create_draft_email(message: EmailMessage, service: build, user_id: str = "me"):
@@ -218,51 +264,23 @@ def main():
     password = os.getenv("PASSWORD")
     creds = authorize_google()
     try:
-        # service = build("sheets", "v4", credentials=creds)
-        # sheet = service.spreadsheets()
-        # classes = get_links(sheet)
-        # client = get_login_client(
-        #     username=username, password=password, login_url=LOGIN_URL
-        # )
-        # for _class in classes:
-        #     get_csv(_class, client)
-        #     get_registration_emails(_class)
-        #     print(_class.registration_emails)
+        service = build("sheets", "v4", credentials=creds)
+        sheet = service.spreadsheets()
+        classes = get_links(sheet)
+        client = get_login_client(
+            username=username, password=password, login_url=LOGIN_URL
+        )
+        for _class in classes:
+            get_csv(_class, client)
+            get_registration_emails(_class)
+            print(_class.registration_emails)
 
         service = build("gmail", "v1", credentials=creds)
 
-        message = EmailMessage()
+        # Test email
+        message = create_pre_class_email(classes[0], None)
 
-        message.set_content("This is fallback content,\n\nHello world!\n\nBest,\nKang")
-        message.add_alternative(
-            """\
-        <html>
-          <body>
-            <p>This is an <b>HTML</b> email</p>
-          </body>
-        </html>
-        """,
-            subtype="html",
-        )
-
-        message["From"] = "instructor19@nypl.org"
-        message["To"] = "techconnect@nypl.org"
-        message["Bcc"] = [
-            "gduser1@workspacesamples.dev",
-            "test1@example.com",
-            "test2@example.com",
-        ]
-        message["Subject"] = "Automated draft"
-
-        encoded_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
-
-        create_message = {"message": {"raw": encoded_message}}
-        # pylint: disable=E1101
-        draft = (
-            service.users().drafts().create(userId="me", body=create_message).execute()
-        )
-        print(f"Draft id: {draft['id']}\nDraft message: {draft['message']}")
-
+        create_draft_email(message, service)
     except HttpError as err:
         print(err)
 

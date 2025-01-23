@@ -3,4 +3,5 @@
 
 # Secrets
 secrets/
+.env
 

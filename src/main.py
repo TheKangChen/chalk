@@ -47,6 +47,7 @@ LOGIN_URL = "https://www.nypl.org/user"
 
 # Named idices
 date_idx = 0
+day_idx = 1
 start_time_idx = 2
 end_time_idx = 3
 location_idx = 4
@@ -58,6 +59,7 @@ drupal_link_idx = 11
 class VirtualClassInfo:
     class_name: str
     date: str
+    day: str
     start_time: str
     end_time: str
     drupal_link: Optional[str] = None
@@ -89,6 +91,10 @@ def authorize_google():
     return creds
 
 
+def schedule_zoom_meeting():
+    raise
+
+
 def get_links(sheet):
     result = (
         sheet.values().get(spreadsheetId=SPREADSHEET_ID, range=RANGE_NAME).execute()
@@ -107,6 +113,7 @@ def get_links(sheet):
                 VirtualClassInfo(
                     class_name=row[class_idx],
                     date=row[date_idx],
+                    day=row[day_idx],
                     start_time=row[start_time_idx],
                     end_time=row[end_time_idx],
                     drupal_link=row[drupal_link_idx],
@@ -156,50 +163,52 @@ def get_registration_emails(virtual_class: VirtualClassInfo) -> None:
     virtual_class.registration_emails = email_list
 
 
-# test
-def gmail_create_draft():
-    creds, _ = google.auth.default()
+def create_pre_class_email(virtual_class: VirtualClassInfo, zoom_info) -> EmailMessage:
+    message = EmailMessage()
 
-    try:
-        # create gmail api client
-        service = build("gmail", "v1", credentials=creds)
+    message["From"] = "instructor19@nypl.org"
+    message["To"] = "techconnect@nypl.org"
+    message["Bcc"] = [
+        "gduser1@workspacesamples.dev",
+        "test1@example.com",
+        "test2@example.com",
+    ]
+    message["Subject"] = "Automated draft"
 
-        # message = EmailMessage()
-        # message.set_content("This is automated draft mail")
-        #
-        # message["To"] = "gduser1@workspacesamples.dev"
-        # message["From"] = "gduser2@workspacesamples.dev"
-        # message["Subject"] = "Automated draft"
-        #
-        # # encoded message
-        # encoded_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
-        #
-        # create_message = {"message": {"raw": encoded_message}}
-        # pylint: disable=E1101
-        # draft = (
-        #     service.users()
-        #     .drafts()
-        #     .create(userId="me", body=create_message)
-        #     .execute()
-        # )
+    message.set_content("This is fallback content,\n\nHello world!\n\nBest,\nKang")
+    message.add_alternative(
+        """\
+        <html>
+          <body>
+            <p>This is an <b>HTML</b> email</p>
+          </body>
+        </html>
+        """,
+        subtype="html",
+    )
 
-        # print(f'Draft id: {draft["id"]}\nDraft message: {draft["message"]}')
-
-        res = service.users().drafts().list(userId="me").execute()
-        print(res)
-
-    except HttpError as error:
-        print(f"An error occurred: {error}")
-        draft = None
-
-    return draft
+    return message
 
 
-def schedule_email():
+def create_post_class_email(virtual_class: VirtualClassInfo, zoom_info) -> EmailMessage:
     raise
 
 
-def send_email():
+def create_draft_email(message: EmailMessage, service: build, user_id: str = "me"):
+    encoded_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
+
+    create_message = {"message": {"raw": encoded_message}}
+    # pylint: disable=E1101
+    draft = (
+        service.users().drafts().create(userId=user_id, body=create_message).execute()
+    )
+    print(f"Draft id: {draft['id']}\nDraft message: {draft['message']}")
+
+
+def send_email(message: EmailMessage, service: build, user_id: str = "me"):
+    encoded_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
+
+    create_message = {"message": {"raw": encoded_message}}
     raise
 
 
@@ -224,11 +233,25 @@ def main():
 
         message = EmailMessage()
 
-        message.set_content("This is automated draft mail")
+        message.set_content("This is fallback content,\n\nHello world!\n\nBest,\nKang")
+        message.add_alternative(
+            """\
+        <html>
+          <body>
+            <p>This is an <b>HTML</b> email</p>
+          </body>
+        </html>
+        """,
+            subtype="html",
+        )
 
-        message["To"] = "gduser1@workspacesamples.dev"
-        message["Bcc"] = ["gduser1@workspacesamples.dev", "test1@example.com", "test2@example.com"]
         message["From"] = "instructor19@nypl.org"
+        message["To"] = "techconnect@nypl.org"
+        message["Bcc"] = [
+            "gduser1@workspacesamples.dev",
+            "test1@example.com",
+            "test2@example.com",
+        ]
         message["Subject"] = "Automated draft"
 
         encoded_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
@@ -236,12 +259,9 @@ def main():
         create_message = {"message": {"raw": encoded_message}}
         # pylint: disable=E1101
         draft = (
-            service.users()
-            .drafts()
-            .create(userId="me", body=create_message)
-            .execute()
+            service.users().drafts().create(userId="me", body=create_message).execute()
         )
-        print(f'Draft id: {draft["id"]}\nDraft message: {draft["message"]}')
+        print(f"Draft id: {draft['id']}\nDraft message: {draft['message']}")
 
     except HttpError as err:
         print(err)

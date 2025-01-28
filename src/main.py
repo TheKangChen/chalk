@@ -70,6 +70,11 @@ class VirtualClassInfo:
     calander_event_created: Optional[bool] = None
 
 
+def create_email(html_template, *args):
+    ...
+    # meta-class to create email class with the correct template and arg inseart
+
+
 def authorize_google():
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is

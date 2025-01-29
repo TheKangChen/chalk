@@ -33,10 +33,10 @@ TOKEN_PATH = "./secrets/token.json"
 
 # G Sheets
 SPREADSHEET_ID = "1stmP7HQ_lfKxP0FmFHv1CNLYmnf5lGwuan2HPJvoXUc"
-TMR = datetime.date.today() + datetime.timedelta(days=1)
-# DATE_STR = TMR.strftime("%m/%d")[1:]
-DATE_STR = "1/23"
-SHEET_NAME = f"{TMR.year} {TMR.strftime('%B')}"
+SCHEDULED_DATE = datetime.date.today() + datetime.timedelta(days=1)
+FMT_DATE = SCHEDULED_DATE.strftime("%Y/%m/%d")
+# FMT_DATE = "1/23"
+SHEET_NAME = f"{SCHEDULED_DATE.year} {SCHEDULED_DATE.strftime('%B')}"
 RANGE_NAME = SHEET_NAME + "!A1:P50"
 
 
@@ -58,7 +58,7 @@ drupal_link_idx = 11
 class VirtualClassInfo:
     class_name: str
     date: str
-    day: str
+    weekday: str
     start_time: str
     end_time: str
     drupal_link: Optional[str] = None
@@ -112,12 +112,12 @@ def get_links(sheet):
     links = []
     for row in values:
         # Get column L: drupal_link
-        if row[date_idx] == DATE_STR and row[location_idx].lower() == "online":
+        if row[date_idx] == FMT_DATE and row[location_idx].lower() == "online":
             links.append(
                 VirtualClassInfo(
                     class_name=row[class_idx],
                     date=row[date_idx],
-                    day=row[day_idx],
+                    weekday=row[day_idx],
                     start_time=row[start_time_idx],
                     end_time=row[end_time_idx],
                     drupal_link=row[drupal_link_idx],
@@ -180,13 +180,14 @@ def create_pre_class_email(virtual_class: VirtualClassInfo, zoom_info) -> EmailM
         f"""\
         <html>
           <body style="margin: 0; padding: 0; line-height: 1.2; font-size: 13.5px;">
-            <p style="margin: 0; padding: 0;">Thank you for registering for TechConnect's <b>{virtual_class.class_name}</b> virtual class taking place today, <b>{virtual_class.date}</b> <b>{virtual_class.day}</b> at <b>{virtual_class.start_time}</b>!</p>
+            <p style="margin: 0; padding: 0;">Thank you for registering for TechConnect's <b>{virtual_class.class_name}</b> virtual class taking place today, <b>{virtual_class.date}</b> <b>{virtual_class.weekday}</b> at <b>{virtual_class.start_time}</b>!</p>
             <p>The Library uses Zoom to conduct virtual classes. The Library does not own Zoom. We want you to understand how you and the Library use this service. Read the <a href="https://www.nypl.org/help/about-nypl/legal-notices/privacy-policy">Library’s Privacy Policy</a>, especially the section "Third-Party Library Services Providers."</p>
             <p style="margin: 0; padding: 0;"><b>To join the class, click on the following link or copy & paste it into your browser:</b></p>
             <p style="margin: 0; padding: 0;">zoom_link</p>
             <br>
             <p style="margin: 0; padding: 0;">Meeting ID: m_id</p>
             <p style="margin: 0; padding: 0;">Passcode: p_code</p>
+            <br>
             <p><b>Arrival to class on time is mandatory. Entrance into a class will not be permitted 15 minutes after class begins.</b></p>
             <br>
             <p style="margin: 0; padding: 0;"><b>USING THE CHAT BOX</b></p>
@@ -283,9 +284,9 @@ def main():
         service = build("gmail", "v1", credentials=creds)
 
         # Test email
-        message = create_pre_class_email(classes[0], None)
-
-        create_draft_email(message, service)
+        for c in classes:
+            message = create_pre_class_email(c, None)
+            create_draft_email(message, service)
     except HttpError as err:
         print(err)
 

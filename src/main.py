@@ -270,23 +270,52 @@ def main():
     password = os.getenv("PASSWORD")
     creds = authorize_google()
     try:
-        service = build("sheets", "v4", credentials=creds)
-        sheet = service.spreadsheets()
-        classes = get_links(sheet)
-        client = get_login_client(
-            username=username, password=password, login_url=LOGIN_URL
-        )
-        for _class in classes:
-            get_csv(_class, client)
-            get_registration_emails(_class)
-            print(_class.registration_emails)
+        # # Google Sheets
+        # service = build("sheets", "v4", credentials=creds)
+        # sheet = service.spreadsheets()
+        # classes = get_links(sheet)
+        # client = get_login_client(
+        #     username=username, password=password, login_url=LOGIN_URL
+        # )
+        # for _class in classes:
+        #     get_csv(_class, client)
+        #     get_registration_emails(_class)
+        #     print(_class.registration_emails)
+        #
+        # # Gmail
+        # service = build("gmail", "v1", credentials=creds)
+        #
+        # # Test email
+        # for c in classes:
+        #     message = create_pre_class_email(c, None)
+        #     create_draft_email(message, service)
 
-        service = build("gmail", "v1", credentials=creds)
-
-        # Test email
-        for c in classes:
-            message = create_pre_class_email(c, None)
-            create_draft_email(message, service)
+        # Calendar
+        service = build("calendar", "v3", credentials=creds)
+        event = {
+            "summary": "Fundamentals of Programming with Python Part 1",
+            "location": "",
+            "description": "",
+            "start": {
+                "dateTime": "2025-01-30T11:00:00",
+                "timeZone": "America/New_York",
+            },
+            "end": {
+                "dateTime": "2025-01-30T12:30:00",
+                "timeZone": "America/New_York",
+            },
+            "recurrence": [],
+            "attendees": [],
+            "reminders": {},
+            "conferenceData": {
+                "createRequest": {
+                    "conferenceSolutionKey": {"type": "Zoom Meeting"},
+                    "requestId": "random-string-123",
+                }
+            },
+        }
+        event = service.events().insert(calendarId="primary", body=event, conferenceDataVersion=1).execute()
+        print(f"Event created: {event.get('htmlLink')}")
     except HttpError as err:
         print(err)
 

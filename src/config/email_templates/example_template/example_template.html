@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<body style="font-family: Arial, sans-serif; font-size: 10pt; line-height: 1.4; max-width: 600px; margin: 0 auto;">
+    <div style="padding: 20px;">
+        <h2 style="color: ${header_color};">Email Template Example</h2>
+        
+        <p>
+            This is an example email demonstrating how to use <strong>template variables</strong> 
+            with the email template engine.
+        </p>
+
+        <div style="background-color: #f5f5f5; padding: 15px; margin: 20px 0; border-left: 4px solid #0071CE;">
+            <h3>Basic Variable: ${basic_variable}</h3>
+            <p>This demonstrates a basic variable substitution.</p>
+        </div>
+
+        <div style="background-color: #f5f5f5; padding: 15px; margin: 20px 0; border-left: 4px solid #799A05;">
+            <h3>Simple Variable: $simple_variable</h3>
+            <p>Variables can be written with or without curly brackets.</p>
+        </div>
+
+        <div style="margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 4px;">
+            <h3 style="margin-top: 0;">Important Notes:</h3>
+            <ul style="padding-left: 20px;">
+                <li>Each variable name must be <span style="color: #D0343A;"><strong>unique</strong></span></li>
+                <li>All template variables must be defined in <code>variables.json</code></li>
+                <li>Variables are case-sensitive</li>
+                <li>Use $${variable} when next to text to avoid ambiguity</li>
+            </ul>
+        </div>
+
+        <div style="background-color: #f8f8f8; padding: 15px; border-radius: 4px;">
+            <p>Current date: $current_date</p>
+            <p>Template version: $version</p>
+        </div>
+
+        <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
+
+        <p style="color: #666; font-size: 9pt;">
+            This is an example template. Please keep for reference.
+        </p>
+    </div>
+</body>
+</html>

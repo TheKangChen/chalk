@@ -1,0 +1,21 @@
+EMAIL TEMPLATE EXAMPLE
+
+This is an example email demonstrating how to use template variables with the email template engine.
+
+Basic Variable: ${basic_variable}
+This demonstrates a basic variable substitution.
+
+Simple Variable: $simple_variable
+Variables can be written with or without curly brackets.
+
+IMPORTANT NOTES:
+- Each variable name must be unique
+- All template variables must be defined in variables.json
+- Variables are case-sensitive
+- Use ${variable} when next to text to avoid ambiguity
+
+Current date: $current_date
+Template version: $version
+
+---
+This is an example template. Please keep for reference.

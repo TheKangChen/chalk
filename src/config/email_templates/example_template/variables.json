@@ -1,0 +1,11 @@
+{
+    "subject": "Example Template Demonstration",
+    "from_email": "sender@example.com",
+    "to_email": "recipient1@example.com",
+    "cc": ["recipient2@example.com", "recipient3@example.com", "recipient3@example.com"],
+    "basic_variable": "Variable with brackets",
+    "simple_variable": "Variable without brackets",
+    "header_color": "#333333",
+    "current_date": "January 29, 2024",
+    "version": "1.0.0"
+}

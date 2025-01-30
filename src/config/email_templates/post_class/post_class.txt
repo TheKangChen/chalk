@@ -1,0 +1,17 @@
+Hello friend,
+
+Thank you so much for attending ${class_name}.
+Attached is the PDF handout and the files we worked on in class.
+
+Handout: ${handout}
+Class File: ${file}
+
+Directly below is a link to a survey that lets us know how we’re doing and any additional feedback you might have.
+Please take some time to fill out the survey in full so that we can learn how to better serve you.
+
+Click here to complete our online class survey:
+https://docs.google.com/forms/d/e/1FAIpQLSeRoFsj9kC436jyBuImwv2QToGSYYZDo1SygTEnsQ-k3ozHng/viewform
+
+Kind regards,
+
+Your friends at TechConnect

@@ -1,0 +1,25 @@
+Thank you for registering for TechConnect’s ${class_name} virtual class taking place today, ${month} ${day} at ${time}!
+
+The Library uses Zoom to conduct virtual classes. The Library does not own Zoom. We want you to understand how you and the Library use this service. Read the Library’s Privacy Policy, especially the section "Third-Party Library Services Providers":
+https://www.nypl.org/help/about-nypl/legal-notices/privacy-policy
+
+To join the class, click on the following link or copy & paste it into your browser:
+${zoom_link}
+
+Meeting ID: ${meeting_id}
+Passcode: ${passcode}
+
+Arrival to class on time is mandatory. Entrance into a class will not be permitted 15 minutes after class begins.
+
+USING THE CHAT BOX
+
+To communicate with the instructor and the rest of the class:
+	• Click the Chat icon in the meeting control bar at the bottom of the window.
+	• Once the chat window is open on the right side of the window, click on a gray box at the bottom of the sidebar where it says "Type message here."
+	• Type your question or comment.
+	• Hit the "Enter" or "Return" key on your keyboard to submit your question or comment.
+
+⚠ Please note that the entire group will be able to see your question or comment, so be careful not to include any personal information in your messages.
+
+See you soon!
+Your friends at TechConnect

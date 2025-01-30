@@ -178,31 +178,63 @@ def create_pre_class_email(virtual_class: VirtualClassInfo, zoom_info) -> EmailM
     message.set_content("This is fallback content,\n\nHello world!\n\nBest,\nKang")
     message.add_alternative(
         f"""\
+        <!DOCTYPE html>
         <html>
-          <body style="margin: 0; padding: 0; line-height: 1.2; font-size: 13.5px;">
-            <p style="margin: 0; padding: 0;">Thank you for registering for TechConnect's <b>{virtual_class.class_name}</b> virtual class taking place today, <b>{virtual_class.date}</b> <b>{virtual_class.weekday}</b> at <b>{virtual_class.start_time}</b>!</p>
-            <p>The Library uses Zoom to conduct virtual classes. The Library does not own Zoom. We want you to understand how you and the Library use this service. Read the <a href="https://www.nypl.org/help/about-nypl/legal-notices/privacy-policy">Library’s Privacy Policy</a>, especially the section "Third-Party Library Services Providers."</p>
-            <p style="margin: 0; padding: 0;"><b>To join the class, click on the following link or copy & paste it into your browser:</b></p>
-            <p style="margin: 0; padding: 0;">zoom_link</p>
-            <br>
-            <p style="margin: 0; padding: 0;">Meeting ID: m_id</p>
-            <p style="margin: 0; padding: 0;">Passcode: p_code</p>
-            <br>
-            <p><b>Arrival to class on time is mandatory. Entrance into a class will not be permitted 15 minutes after class begins.</b></p>
-            <br>
-            <p style="margin: 0; padding: 0;"><b>USING THE CHAT BOX</b></p>
-            <p style="margin: 0; padding: 0;">To communicate with the instructor and the rest of the class:</p>
-            <ul>
-                <li>Click the Chat icon in the meeting control bar at the bottom of the window.</li>
-                <li>Once the chat window is open on the right side of the window, click on a gray box at the bottom of the sidebar where it says "Type message here."</li>
-                <li>Type your question or comment.</li>
-                <li>Hit the "Enter" or "Return" key on your keyboard to submit your question or comment.</li>
-            </ul>
-            <br>
-            <p style="color: #D0343A;">Please note that the entire group will be able to see your question or comment so be careful not to include any personal information in your messages.</p>
-            <p style="margin: 0; padding: 0;">See you soon!</p>
-            <p style="margin: 0; padding: 0;">Your friends at <span style="color: #799A05;">Tech</span><span style="color: #0071CE;">Connect</span></p>
-          </body>
+            <body>
+                <div style="font-family: Arial, sans-serif; font-size: 10pt; line-height: 1.2; max-width: 600px; margin: 0 auto; vertical-align:baseline;">
+                    <p style="margin-top: 0pt; margin-bottom: 0pt;">
+                        Thank you for registering for TechConnect's 
+                        <span style="font-weight: 700">{virtual_class.class_name}</span> 
+                        virtual class taking place today, 
+                        <span style="font-weight: 700">{virtual_class.date} {virtual_class.weekday}</span> 
+                        at 
+                        <span style="font-weight: 700">{virtual_class.start_time}</span>!
+                    </p>
+                    <br>
+                    <p style="margin-top: 0pt; margin-bottom: 0pt;">
+                        The Library uses Zoom to conduct virtual classes. The Library does not own Zoom. We want you to understand how you and the Library use this service. Read the 
+                        <a href="https://www.nypl.org/help/about-nypl/legal-notices/privacy-policy" style="color: #2b66cc; text-decoration: underline;">Library's Privacy Policy</a>, 
+                        especially the section "Third-Party Library Services Providers."
+                    </p>
+                    <br>
+                    <p style="margin-top: 0pt; margin-bottom: 0pt; font-weight: 700;">To join the class, click on the following link or copy & paste it into your browser:</p>
+                    <div style="font-size:13.3333px;">
+                        {zoom_info}
+                    </div>
+                    <br>
+                    <div style="font-size:13.3333px;">
+                        <div>Meeting ID: {zoom_info}</div>
+                        <div>Passcode: {zoom_info}</div>
+                    </div>
+                    <br>
+                    <p style="font-weight: 700; margin-top:0pt; margin-bottom:0pt;">
+                        Arrival to class on time is mandatory. Entrance into a class will not be permitted 15 minutes after class begins.
+                    </p>
+                    <br>
+                    <br>
+                    <div style="margin-top:0pt; margin-bottom:0pt;">
+                        <p style="font-weight: 700; margin-top:0pt; margin-bottom:0pt;">USING THE CHAT BOX</p>
+                        <p>To communicate with the instructor and the rest of the class:</p>
+                        <ul style="margin-top:0pt; margin-bottom:0pt; padding-left: 20px;">
+                            <li style="margin-top:0pt; margin-bottom:0pt;">Click the Chat icon in the meeting control bar at the bottom of the window.</li>
+                            <li style="margin-top:0pt; margin-bottom:0pt;">Once the chat window is open on the right side of the window, click on a gray box at the bottom of the sidebar where it says "Type message here."</li>
+                            <li style="margin-top:0pt; margin-bottom:0pt;">Type your question or comment.</li>
+                            <li style="margin-top:0pt; margin-bottom:0pt;">Hit the "Enter" or "Return" key on your keyboard to submit your question or comment.</li>
+                        </ul>
+                    </div>
+                    <br>
+                    <br>
+                    <p style="color: #cc0000; margin: 15px 0;">
+                        Please note that the entire group will be able to see your question or comment so be careful not to include any personal information in your messages.
+                    </p>
+                    <br>
+                    <p style="margin-top: 20px;">
+                        See you soon!<br>
+                        Your friends at 
+                        <span style="color: #6aa84f;">Tech</span><span style="color: #3d85c6;">Connect</span>
+                    </p>
+                </div>
+            </body>
         </html>
         """,
         subtype="html",
@@ -270,52 +302,56 @@ def main():
     password = os.getenv("PASSWORD")
     creds = authorize_google()
     try:
-        # # Google Sheets
-        # service = build("sheets", "v4", credentials=creds)
-        # sheet = service.spreadsheets()
-        # classes = get_links(sheet)
-        # client = get_login_client(
-        #     username=username, password=password, login_url=LOGIN_URL
-        # )
-        # for _class in classes:
-        #     get_csv(_class, client)
-        #     get_registration_emails(_class)
-        #     print(_class.registration_emails)
-        #
-        # # Gmail
-        # service = build("gmail", "v1", credentials=creds)
-        #
-        # # Test email
-        # for c in classes:
-        #     message = create_pre_class_email(c, None)
-        #     create_draft_email(message, service)
+        # Google Sheets
+        service = build("sheets", "v4", credentials=creds)
+        sheet = service.spreadsheets()
+        classes = get_links(sheet)
+        client = get_login_client(
+            username=username, password=password, login_url=LOGIN_URL
+        )
+        for _class in classes:
+            get_csv(_class, client)
+            get_registration_emails(_class)
+            print(_class.registration_emails)
 
-        # Calendar
-        service = build("calendar", "v3", credentials=creds)
-        event = {
-            "summary": "Fundamentals of Programming with Python Part 1",
-            "location": "",
-            "description": "",
-            "start": {
-                "dateTime": "2025-01-30T11:00:00",
-                "timeZone": "America/New_York",
-            },
-            "end": {
-                "dateTime": "2025-01-30T12:30:00",
-                "timeZone": "America/New_York",
-            },
-            "recurrence": [],
-            "attendees": [],
-            "reminders": {},
-            "conferenceData": {
-                "createRequest": {
-                    "conferenceSolutionKey": {"type": "Zoom Meeting"},
-                    "requestId": "random-string-123",
-                }
-            },
-        }
-        event = service.events().insert(calendarId="primary", body=event, conferenceDataVersion=1).execute()
-        print(f"Event created: {event.get('htmlLink')}")
+        # Gmail
+        service = build("gmail", "v1", credentials=creds)
+
+        # Test email
+        for c in classes:
+            message = create_pre_class_email(c, None)
+            create_draft_email(message, service)
+
+        # # Calendar
+        # service = build("calendar", "v3", credentials=creds)
+        # event = {
+        #     "summary": "Fundamentals of Programming with Python Part 1",
+        #     "location": "",
+        #     "description": "",
+        #     "start": {
+        #         "dateTime": "2025-01-30T11:00:00",
+        #         "timeZone": "America/New_York",
+        #     },
+        #     "end": {
+        #         "dateTime": "2025-01-30T12:30:00",
+        #         "timeZone": "America/New_York",
+        #     },
+        #     "recurrence": [],
+        #     "attendees": [],
+        #     "reminders": {},
+        #     "conferenceData": {
+        #         "createRequest": {
+        #             "conferenceSolutionKey": {"type": "Zoom Meeting"},
+        #             "requestId": "random-string-123",
+        #         }
+        #     },
+        # }
+        # event = (
+        #     service.events()
+        #     .insert(calendarId="primary", body=event, conferenceDataVersion=1)
+        #     .execute()
+        # )
+        # print(f"Event created: {event.get('htmlLink')}")
     except HttpError as err:
         print(err)
 

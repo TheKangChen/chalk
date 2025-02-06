@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from email.message import EmailMessage
 from typing import Optional
 
+import uuid
 import httpx
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
@@ -314,6 +315,8 @@ def main():
             get_registration_emails(_class)
             print(_class.registration_emails)
 
+        # TODO: Create Zoom meeting
+
         # Gmail
         service = build("gmail", "v1", credentials=creds)
 
@@ -322,18 +325,18 @@ def main():
             message = create_pre_class_email(c, None)
             create_draft_email(message, service)
 
-        # # Calendar
+        # Calendar
         # service = build("calendar", "v3", credentials=creds)
         # event = {
         #     "summary": "Fundamentals of Programming with Python Part 1",
         #     "location": "",
         #     "description": "",
         #     "start": {
-        #         "dateTime": "2025-01-30T11:00:00",
+        #         "dateTime": "2025-02-08T11:00:00",
         #         "timeZone": "America/New_York",
         #     },
         #     "end": {
-        #         "dateTime": "2025-01-30T12:30:00",
+        #         "dateTime": "2025-02-08T12:30:00",
         #         "timeZone": "America/New_York",
         #     },
         #     "recurrence": [],
@@ -341,14 +344,14 @@ def main():
         #     "reminders": {},
         #     "conferenceData": {
         #         "createRequest": {
-        #             "conferenceSolutionKey": {"type": "Zoom Meeting"},
-        #             "requestId": "random-string-123",
+        #             "conferenceSolutionKey": {"type": "addOn"},
+        #             "requestId": str(uuid.uuid4()),
         #         }
         #     },
         # }
         # event = (
         #     service.events()
-        #     .insert(calendarId="primary", body=event, conferenceDataVersion=1)
+        #     .insert(calendarId="primary", body=event, conferenceDataVersion=0)
         #     .execute()
         # )
         # print(f"Event created: {event.get('htmlLink')}")

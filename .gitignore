@@ -1,8 +1,12 @@
+# macos
 .DS_Store
+
+# virtual env
 .venv/
 
-# Secrets
+# Secrets & credentials
 secrets/
+credentials/
 .env
 config.py
 

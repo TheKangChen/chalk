@@ -1,0 +1,28 @@
+#!/usr/bin/env python3
+
+import os
+import shutil
+from pathlib import Path
+
+
+def setup_configuration():
+    # Config setup
+    if not Path("config/config.py").exists():
+        shutil.copy("config/config.example.py", "config/config.py")
+        print("Created config.py - please update with your settings")
+
+    # Credentials setup
+    credentials_dir = Path("credentials")
+    credentials_dir.mkdir(exist_ok=True)
+
+    if not Path("credentials/credentials.json").exists():
+        print(
+            "\nAction needed: Place your credentials.json in the credentials/ directory"
+        )
+
+    if not Path("credentials/token.json").exists():
+        print("Note: token.json will be generated when you first authenticate")
+
+
+if __name__ == "__main__":
+    setup_configuration()

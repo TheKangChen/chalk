@@ -1,7 +1,7 @@
 import re
 from playwright.sync_api import Playwright, sync_playwright, expect
 
-from config import nypl_email, zoom_password
+from config.config import nypl_email, zoom_password
 
 
 def run(playwright: Playwright) -> str:

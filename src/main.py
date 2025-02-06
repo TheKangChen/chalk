@@ -3,19 +3,31 @@ import datetime
 import os
 import os.path
 import re
+import uuid
 from dataclasses import dataclass
 from email.message import EmailMessage
 from typing import Optional
 
-import uuid
 import httpx
 from bs4 import BeautifulSoup
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+
+from config.config import (
+    CRED_PATH,
+    DRUPAL_LOGIN_URL,
+    SPREADSHEET_ID,
+    TOKEN_PATH,
+    drupal_password,
+    instructor_email,
+    nypl_email,
+    zoom_password,
+    techconnect_email,
+)
 
 # Google API authorization
 SCOPES = [
@@ -28,12 +40,9 @@ SCOPES = [
     # "https://www.googleapis.com/auth/gmail.labels",
     "https://www.googleapis.com/auth/calendar.events.owned",
 ]
-CRED_PATH = "./secrets/credentials.json"
-TOKEN_PATH = "./secrets/token.json"
 
 
 # G Sheets
-SPREADSHEET_ID = "1stmP7HQ_lfKxP0FmFHv1CNLYmnf5lGwuan2HPJvoXUc"
 SCHEDULED_DATE = datetime.date.today() + datetime.timedelta(days=1)
 FMT_DATE = SCHEDULED_DATE.strftime("%Y/%m/%d")
 # FMT_DATE = "1/23"
@@ -41,11 +50,7 @@ SHEET_NAME = f"{SCHEDULED_DATE.year} {SCHEDULED_DATE.strftime('%B')}"
 RANGE_NAME = SHEET_NAME + "!A1:P50"
 
 
-# Drupal
-LOGIN_URL = "https://www.nypl.org/user"
-
-
-# Named idices
+# Named indices
 date_idx = 0
 day_idx = 1
 start_time_idx = 2
@@ -171,8 +176,8 @@ def get_registration_emails(virtual_class: VirtualClassInfo) -> None:
 def create_pre_class_email(virtual_class: VirtualClassInfo, zoom_info) -> EmailMessage:
     message = EmailMessage()
 
-    message["From"] = "instructor19@nypl.org"
-    message["To"] = "techconnect@nypl.org"
+    message["From"] = instructor_email
+    message["To"] = techconnect_email
     message["Bcc"] = virtual_class.registration_emails
     message["Subject"] = f"TechConnect: Join Link for {virtual_class.class_name}"
 
@@ -247,8 +252,8 @@ def create_pre_class_email(virtual_class: VirtualClassInfo, zoom_info) -> EmailM
 def create_post_class_email(virtual_class: VirtualClassInfo, zoom_info) -> EmailMessage:
     message = EmailMessage()
 
-    message["From"] = "instructor19@nypl.org"
-    message["To"] = "techconnect@nypl.org"
+    message["From"] = instructor_email
+    message["To"] = techconnect_email
     message["Bcc"] = virtual_class.registration_emails
     message["Subject"] = (
         f"TechConnect: {virtual_class.class_name} Class Handout, Practice Files & Survey"
@@ -298,18 +303,18 @@ def send_email(message: EmailMessage, service: build, user_id: str = "me"):
 
 
 def main():
-    load_dotenv()
-    username = os.getenv("USERNAME")
-    password = os.getenv("PASSWORD")
     creds = authorize_google()
     try:
         # Google Sheets
         service = build("sheets", "v4", credentials=creds)
         sheet = service.spreadsheets()
         classes = get_links(sheet)
+
+        # Login to drupal
         client = get_login_client(
-            username=username, password=password, login_url=LOGIN_URL
+            username=nypl_email, password=drupal_password, login_url=DRUPAL_LOGIN_URL
         )
+        # get registration emails from drupal
         for _class in classes:
             get_csv(_class, client)
             get_registration_emails(_class)

@@ -10,3 +10,5 @@ credentials/
 .env
 config.py
 
+# cache
+__pycache__

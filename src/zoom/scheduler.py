@@ -44,7 +44,9 @@ class ZoomScheduler:
 
             return self._parse_zoom_invite(invitation)
         except Exception as e:
-            self.logger.error(f"Failed to schedule meeting: {str(e)}")
+            self.logger.error(
+                f"Failed to schedule meeting: {str(e)}"
+            )  # HACK: switch to rich logger
             raise
         finally:
             context.close()
@@ -59,7 +61,7 @@ class ZoomScheduler:
         page.fill('input[name="email"]', self.config.email)
         page.fill('input[name="password"]', self.config.password)
 
-        # page.get_by_role("button", name="Sign In", exact=True).click()
+        # NOTE: codegen: page.get_by_role("button", name="Sign In", exact=True).click()
 
         with page.expect_navigation():
             page.click('button[id="js_btn_login"]')
@@ -79,7 +81,7 @@ class ZoomScheduler:
         # Set date
         date_str = self.config.date.strftime("%B %-d %Y %A")
         page.click('[id="mt_time"]')
-        # page.get_by_role("combobox", name="choose date").click()
+        # NOTE: codegen: page.get_by_role("combobox", name="choose date").click()
         page.get_by_role("button", name=date_str).first.click()
 
         # Set time
@@ -92,30 +94,23 @@ class ZoomScheduler:
         page.click('[role="button"][id="start_time2"]')
         page.get_by_role("option", name=meridiem).locator("div").click()
 
-        # FIX: Set duration
-        # page.click(f'button[name="select duration hours,{self.config.duration_hours}"]')
-        # page.click(f'[role="option"][name="{self.config.duration_minutes}"]')
-
-        # page.click('[role="button"][id="duration_time"]')
-        # page.get_by_role("button", name="select duration hours,1").click()
-        # page.get_by_role("option", name=self.config.duration_hours, exact=True).locator("div").click()
-        # page.get_by_role("combobox", name="select duration minutes").click()
-        # page.get_by_role("option", name=self.config.duration_minutes).locator("div").click()
-
+        # Set duration
         page.get_by_role("button", name="select duration hours,1").click()
-        page.get_by_role("option", name="1", exact=True).locator("div").click()
+        page.get_by_role(
+            "option", name=f"{self.config.duration_hours}", exact=True
+        ).locator("div").click()
         page.get_by_role("combobox", name="select duration minutes").click()
-        page.get_by_role("option", name="30").locator("div").click()
-
+        page.get_by_role("option", name=f"{self.config.duration_minutes}").locator(
+            "div"
+        ).click()
 
         # Save meeting
-        page.wait_for_selector('button[name="Save"]')
-        page.click('button[name="Save"]')
+        page.mouse.wheel(0, 1000)
+        page.get_by_role("button", name="Save").click()
 
     def _get_meeting_invitation(self, page) -> str:
         """Get meeting invitation text."""
-        page.wait_for_selector('button[name=" Copy Invitation"]')
-        page.click('button[name=" Copy Invitation"]')
+        page.get_by_role("button", name="Copy Invitation").click()
 
         textarea = page.query_selector("textarea")
         return textarea.evaluate("node => node.value")
@@ -146,23 +141,3 @@ def schedule_zoom_meeting(config: ZoomMeetingConfig):
     scheduler = ZoomScheduler(config)
     with sync_playwright() as playwright:
         return scheduler.schedule_meeting(playwright)
-
-
-if __name__ == "__main__":
-    # Example Usage
-    meeting_config = ZoomMeetingConfig(
-        topic="Fundamentals of Programming with Python Part 2",
-        date=datetime(2025, 2, 6, 11, 0),  # 11:00 AM on Feb 6, 2025
-        duration_hours=1,
-        duration_minutes=30,
-        email="your_email@example.com",
-        password="your_password",
-    )
-
-    try:
-        meeting_info = schedule_zoom_meeting(meeting_config)
-        print(f"Meeting Link: {meeting_info.meeting_link}")
-        print(f"Meeting ID: {meeting_info.meeting_id}")
-        print(f"Passcode: {meeting_info.passcode}")
-    except Exception as e:
-        print(f"Failed to schedule meeting: {e}")

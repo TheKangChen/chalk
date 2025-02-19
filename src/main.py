@@ -1,7 +1,10 @@
+import os
+import sys
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 import base64
 import datetime
-import os
-import os.path
 import re
 import uuid
 from dataclasses import dataclass
@@ -10,6 +13,7 @@ from typing import Optional
 
 import httpx
 from bs4 import BeautifulSoup
+
 # from dotenv import load_dotenv
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -25,8 +29,8 @@ from config.config import (
     drupal_password,
     instructor_email,
     nypl_email,
-    zoom_password,
     techconnect_email,
+    zoom_password,
 )
 
 # Google API authorization
@@ -44,8 +48,8 @@ SCOPES = [
 
 # G Sheets
 SCHEDULED_DATE = datetime.date.today() + datetime.timedelta(days=1)
-FMT_DATE = SCHEDULED_DATE.strftime("%Y/%m/%d")
-# FMT_DATE = "1/23"
+# FMT_DATE = SCHEDULED_DATE.strftime("%Y/%m/%d")
+FMT_DATE = "2025/02/19"
 SHEET_NAME = f"{SCHEDULED_DATE.year} {SCHEDULED_DATE.strftime('%B')}"
 RANGE_NAME = SHEET_NAME + "!A1:P50"
 

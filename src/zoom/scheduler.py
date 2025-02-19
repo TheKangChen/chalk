@@ -31,7 +31,7 @@ class ZoomScheduler:
     def schedule_meeting(self, playwright: Playwright) -> ZoomMeetingInfo:
         """Schedule a Zoom meeting and return meeting information."""
         try:
-            browser = playwright.chromium.launch(headless=False)
+            browser = playwright.chromium.launch(headless=True)
             context = browser.new_context(viewport={"width": 1280, "height": 720})
             page = context.new_page()
 

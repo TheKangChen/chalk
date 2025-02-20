@@ -1,9 +1,12 @@
-from playwright.sync_api import Playwright, sync_playwright, expect
-from dataclasses import dataclass
-from typing import Optional
-import re
-from datetime import datetime
 import logging  # HACK: Use rich logger
+import re
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Optional
+
+from playwright.sync_api import Playwright, sync_playwright
+
+from src.chalk_utils.sys_utils import kill_zoom_processes
 
 
 @dataclass
@@ -24,16 +27,32 @@ class ZoomMeetingInfo:
 
 
 class ZoomScheduler:
-    def __init__(self, config: ZoomMeetingConfig):
+    def __init__(self, config: ZoomMeetingConfig) -> None:
         self.config = config
         self.logger = logging.getLogger(__name__)  # HACK: switch to rich logger
 
     def schedule_meeting(self, playwright: Playwright) -> ZoomMeetingInfo:
         """Schedule a Zoom meeting and return meeting information."""
+        kill_zoom_processes()
+
         try:
-            browser = playwright.chromium.launch(headless=True)
-            context = browser.new_context(viewport={"width": 1280, "height": 720})
+            browser = playwright.chromium.launch(
+                headless=True,
+                args=[
+                    "--disable-dev-shm-usage",
+                    "--no-sandbox",
+                    "--disable-setuid-sandbox",
+                    "--disable-gpu",
+                    "--disable-software-rasterizer",
+                ],
+            )
+            context = browser.new_context(
+                viewport={"width": 1280, "height": 720},
+                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+            )
             page = context.new_page()
+
+            page.on("console", lambda msg: self.logger.debug(f"Browser console: {msg.text}"))
 
             # Enable request interception for faster loading
             page.route("**/*.{png,jpg,jpeg,gif,svg}", lambda route: route.abort())
@@ -45,15 +64,22 @@ class ZoomScheduler:
             return self._parse_zoom_invite(invitation)
         except Exception as e:
             self.logger.error(
-                f"Failed to schedule meeting: {str(e)}"
+                f"Failed to schedule meeting: {e!s}"
             )  # HACK: switch to rich logger
+            if page:
+                # Take screenshot to diagnose the issue
+                page.screenshot(path=f"{datetime.now().strftime("%d-%m-%Y_%H-%M-%S")}_error_screenshot.png")
+                self.logger.error(f"Current URL: {page.url}")
             raise
         finally:
-            context.close()
-            browser.close()
+            if context:
+                context.close()
+            if browser:
+                browser.close()
 
     def _login(self, page) -> None:
         """Handle Zoom login."""
+
         page.goto("https://app.zoom.us/meeting/schedule")
 
         # Wait for login form and fill credentials
@@ -63,8 +89,7 @@ class ZoomScheduler:
 
         # NOTE: codegen: page.get_by_role("button", name="Sign In", exact=True).click()
 
-        with page.expect_navigation():
-            page.click('button[id="js_btn_login"]')
+        page.click('button[id="js_btn_login"]')
 
         # Handle potential CAPTCHA
         if "recaptcha" in page.url:
@@ -110,6 +135,7 @@ class ZoomScheduler:
 
     def _get_meeting_invitation(self, page) -> str:
         """Get meeting invitation text."""
+
         page.get_by_role("button", name="Copy Invitation").click()
 
         textarea = page.query_selector("textarea")
@@ -136,7 +162,7 @@ class ZoomScheduler:
         return ZoomMeetingInfo(**results)
 
 
-def schedule_zoom_meeting(config: ZoomMeetingConfig):
+def schedule_zoom_meeting(config: ZoomMeetingConfig) -> ZoomMeetingInfo:
     """Main function to schedule a Zoom meeting."""
     scheduler = ZoomScheduler(config)
     with sync_playwright() as playwright:

@@ -4,11 +4,14 @@
 # virtual env
 .venv/
 
+# Logs
+run_logs/
+
 # Secrets & credentials
 secrets/
 credentials/
 .env
 config.py
 
-# cache
+# Cache
 __pycache__

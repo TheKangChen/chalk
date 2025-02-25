@@ -1,0 +1,28 @@
+[project]
+name = "chalk"
+version = "0.1.0"
+description = "An all-in-one cli companion applicaiton for NYPL TechConnect instructors and administrators."
+authors = [{ name = "Kang Chen", email = "kangchen.work@gmail.com" }]
+license = "MIT"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "click",
+    "httpx",
+    "beautifulsoup4",
+    "google-api-python-client",
+    "google-auth-httplib2",
+    "google-auth-oauthlib",
+    "playwright",
+]
+
+[project.scripts]
+chalk = "chalk.cli:cli"
+
+[dependency-group]
+dev = ["pytest"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+

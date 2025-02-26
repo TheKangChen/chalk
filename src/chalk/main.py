@@ -1,7 +1,7 @@
 import os
 import sys
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 import base64
 import datetime
@@ -27,7 +27,7 @@ from config.config import (
     SPREADSHEET_ID,
     TOKEN_PATH,
     drupal_password,
-    instructor_email,
+    nypl_email,
     nypl_email,
     techconnect_email,
     zoom_password,
@@ -48,8 +48,8 @@ SCOPES = [
 
 # G Sheets
 SCHEDULED_DATE = datetime.date.today() + datetime.timedelta(days=1)
-# FMT_DATE = SCHEDULED_DATE.strftime("%Y/%m/%d")
-FMT_DATE = "2025/02/20"
+FMT_DATE = SCHEDULED_DATE.strftime("%Y/%m/%d")
+# FMT_DATE = "2025/02/20"
 SHEET_NAME = f"{SCHEDULED_DATE.year} {SCHEDULED_DATE.strftime('%B')}"
 RANGE_NAME = SHEET_NAME + "!A1:P50"
 
@@ -180,7 +180,7 @@ def get_registration_emails(virtual_class: VirtualClassInfo) -> None:
 def create_pre_class_email(virtual_class: VirtualClassInfo, zoom_info) -> EmailMessage:
     message = EmailMessage()
 
-    message["From"] = instructor_email
+    message["From"] = nypl_email
     message["To"] = techconnect_email
     message["Bcc"] = virtual_class.registration_emails
     message["Subject"] = f"TechConnect: Join Link for {virtual_class.class_name}"
@@ -256,7 +256,7 @@ def create_pre_class_email(virtual_class: VirtualClassInfo, zoom_info) -> EmailM
 def create_post_class_email(virtual_class: VirtualClassInfo, zoom_info) -> EmailMessage:
     message = EmailMessage()
 
-    message["From"] = instructor_email
+    message["From"] = nypl_email
     message["To"] = techconnect_email
     message["Bcc"] = virtual_class.registration_emails
     message["Subject"] = (

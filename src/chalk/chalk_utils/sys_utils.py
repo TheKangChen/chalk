@@ -12,7 +12,7 @@ class Platform(Enum):
     UNKNOWN = auto()
 
 
-def _get_current_platform() -> Platform:
+def get_current_platform() -> Platform:
     """Determine the current operating system platform."""
     system = platform.system()
     match system:
@@ -43,9 +43,9 @@ def _sanitize_process_name(process_name: str) -> str:
     return sanitized
 
 
-def _kill_processes(process_name: str) -> None:
+def kill_processes(process_name: str) -> None:
     safe_process_name = _sanitize_process_name(process_name)
-    current_platform = _get_current_platform()
+    current_platform = get_current_platform()
     cmd_args = []
 
     try:
@@ -71,18 +71,3 @@ def _kill_processes(process_name: str) -> None:
     except subprocess.SubprocessError as e:
         logging.warning(f"Error killing process {process_name}: {e}")
 
-
-def kill_zoom_processes() -> None:
-    current_platform = _get_current_platform()
-
-    if current_platform != Platform.UNKNOWN:
-        process_name = {
-            Platform.WINDOWS: "Zoom.exe",
-            Platform.MACOS: "zoom.us",
-            Platform.LINUX: "zoom",
-        }.get(current_platform)
-
-        if process_name:
-            _kill_processes(process_name)
-        else:
-            logging.error(f"Attempted to kill unauthorized process: {process_name}")

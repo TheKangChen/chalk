@@ -11,7 +11,6 @@ run_logs/
 secrets/
 credentials/
 .env
-config.py
 
 # Cache
 __pycache__

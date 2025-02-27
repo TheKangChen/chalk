@@ -1,5 +1,8 @@
+from enum import Enum
 import os
 import sys
+
+from chalk.chalk_utils.env_vars import get_env_vars
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
@@ -8,7 +11,6 @@ import datetime
 import uuid
 from email.message import EmailMessage
 
-# from dotenv import load_dotenv
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
@@ -17,15 +19,10 @@ from chalk.classes.fetch import get_csv, get_registration_emails
 from chalk.classes.models import VirtualClassInfo
 from chalk.google_api.apps import GoogleService, get_service
 from chalk.google_api.auth import authorize_google
-from config.config import (
+from config.default import (
     CRED_PATH,
-    DRUPAL_LOGIN_URL,
     GOOGLE_API_SCOPES,
-    SPREADSHEET_ID,
     TOKEN_PATH,
-    drupal_password,
-    nypl_email,
-    techconnect_email,
 )
 
 # G Sheets
@@ -36,48 +33,56 @@ SHEET_NAME = f"{SCHEDULED_DATE.year} {SCHEDULED_DATE.strftime('%B')}"
 RANGE_NAME = SHEET_NAME + "!A1:P50"
 
 
-# Named indices
-date_idx = 0
-day_idx = 1
-start_time_idx = 2
-end_time_idx = 3
-location_idx = 4
-class_idx = 7
-drupal_link_idx = 11
+# G sheets column enums
+class Column_Idx(Enum):
+    DATE = 0
+    DAY = 1
+    START_TIME = 2
+    END_TIME = 3
+    LOCATION = 4
+    CLASS = 7
+    DRUPAL_LINK = 11
 
 
-def get_links(sheet) -> list[VirtualClassInfo]:
+def get_links(sheet, creds: dict) -> list[VirtualClassInfo] | None:
     result = (
-        sheet.values().get(spreadsheetId=SPREADSHEET_ID, range=RANGE_NAME).execute()
+        sheet.values()
+        .get(spreadsheetId=creds["SPREADSHEET_ID"], range=RANGE_NAME)
+        .execute()
     )
     values = result.get("values", [])
 
     if not values:
         print("No data found.")
-        return
+        return None
     # Get all drupal post links for tmr
     links = []
     for row in values:
         # Get column L: drupal_link
-        if row[date_idx] == FMT_DATE and row[location_idx].lower() == "online":
+        if (
+            row[Column_Idx.DATE.value] == FMT_DATE
+            and row[Column_Idx.LOCATION.value].lower() == "online"
+        ):
             links.append(
                 VirtualClassInfo(
-                    class_name=row[class_idx],
-                    date=row[date_idx],
-                    weekday=row[day_idx],
-                    start_time=row[start_time_idx],
-                    end_time=row[end_time_idx],
-                    drupal_link=row[drupal_link_idx],
+                    class_name=row[Column_Idx.CLASS.value],
+                    date=row[Column_Idx.DATE.value],
+                    weekday=row[Column_Idx.DAY.value],
+                    start_time=row[Column_Idx.START_TIME.value],
+                    end_time=row[Column_Idx.END_TIME.value],
+                    drupal_link=row[Column_Idx.DRUPAL_LINK.value],
                 )
             )
     return links
 
 
-def create_pre_class_email(virtual_class: VirtualClassInfo, zoom_info) -> EmailMessage:
+def create_pre_class_email(
+    virtual_class: VirtualClassInfo, zoom_info, creds: dict
+) -> EmailMessage:
     message = EmailMessage()
 
-    message["From"] = nypl_email
-    message["To"] = techconnect_email
+    message["From"] = creds["NYPL_EMAIL"]
+    message["To"] = creds["TECHCONNECT_EMAIL"]
     message["Bcc"] = virtual_class.registration_emails
     message["Subject"] = f"TechConnect: Join Link for {virtual_class.class_name}"
 
@@ -149,11 +154,13 @@ def create_pre_class_email(virtual_class: VirtualClassInfo, zoom_info) -> EmailM
     return message
 
 
-def create_post_class_email(virtual_class: VirtualClassInfo) -> EmailMessage:
+def create_post_class_email(
+    virtual_class: VirtualClassInfo, creds: dict
+) -> EmailMessage:
     message = EmailMessage()
 
-    message["From"] = nypl_email
-    message["To"] = techconnect_email
+    message["From"] = creds["NYPL_EMAIL"]
+    message["To"] = creds["TECHCONNECT_EMAIL"]
     message["Bcc"] = virtual_class.registration_emails
     message["Subject"] = (
         f"TechConnect: {virtual_class.class_name} Class Handout, Practice Files & Survey"
@@ -195,38 +202,42 @@ def create_draft_email(message: EmailMessage, service: build, user_id: str = "me
     print(f"Draft id: {draft['id']}\nDraft message: {draft['message']}")
 
 
-def send_email(message: EmailMessage, service: build, user_id: str = "me"):
+def send_email(message: EmailMessage, service, user_id: str = "me"):
     encoded_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
 
     create_message = {"message": {"raw": encoded_message}}
     raise
 
 
-def main():
-    creds = authorize_google(TOKEN_PATH, GOOGLE_API_SCOPES, CRED_PATH)
+def main() -> None:
+    creds = get_env_vars()
+    g_creds = authorize_google(TOKEN_PATH, GOOGLE_API_SCOPES, CRED_PATH)
     try:
         # Google Sheets
-        service = get_service(GoogleService.SHEETS, creds)
+        service = get_service(GoogleService.SHEETS, g_creds)
         sheet = service.spreadsheets()
-        classes = get_links(sheet)
+        classes = get_links(sheet, creds)
 
         # Login to drupal
         client = get_login_client(
-            username=nypl_email, password=drupal_password, login_url=DRUPAL_LOGIN_URL
+            username=creds["NYPL_EMAIL"],
+            password=creds["DRUPAL_PASSWORD"],
+            login_url=creds["DRUPAL_LOGIN_URL"],
         )
         # get registration emails from drupal
-        for _class in classes:
-            get_csv(_class, client)
-            get_registration_emails(_class)
-            print(_class.registration_emails)
+        if classes:
+            for _class in classes:
+                get_csv(_class, client)
+                get_registration_emails(_class)
+                print(_class.registration_emails)
 
-        # Gmail
-        service = get_service(GoogleService.GMAIL, creds)
+            # Gmail
+            service = get_service(GoogleService.GMAIL, g_creds)
 
-        # Test email
-        for c in classes:
-            message = create_pre_class_email(c, None)
-            create_draft_email(message, service)
+            # Test email
+            for c in classes:
+                message = create_pre_class_email(c, None, creds)
+                create_draft_email(message, service)
 
         # Calendar
         # service = build(GoogleService.CALENDAR, creds)

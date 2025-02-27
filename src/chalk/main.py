@@ -81,7 +81,7 @@ def create_pre_class_email(
 ) -> EmailMessage:
     message = EmailMessage()
 
-    message["From"] = creds["NYPL_EMAIL"]
+    message["From"] = creds["INSTRUCTOR_EMAIL"]
     message["To"] = creds["TECHCONNECT_EMAIL"]
     message["Bcc"] = virtual_class.registration_emails
     message["Subject"] = f"TechConnect: Join Link for {virtual_class.class_name}"
@@ -159,7 +159,7 @@ def create_post_class_email(
 ) -> EmailMessage:
     message = EmailMessage()
 
-    message["From"] = creds["NYPL_EMAIL"]
+    message["From"] = creds["INSTRUCTOR_EMAIL"]
     message["To"] = creds["TECHCONNECT_EMAIL"]
     message["Bcc"] = virtual_class.registration_emails
     message["Subject"] = (

@@ -89,7 +89,7 @@ class BodyTextFormatField(FormField):
 
 @dataclass
 class ShowEndDateBox(FormField):
-    index: int
+    index: int = 0
     key: str = field(init=False)
     value: str = "1"
 
@@ -100,7 +100,7 @@ class ShowEndDateBox(FormField):
 # NOTE: Populate Field & add date validation
 @dataclass
 class DateStartMonthField(FormField):
-    index: int
+    index: int = 0
     key: str = field(init=False)
     value: str
 
@@ -111,7 +111,7 @@ class DateStartMonthField(FormField):
 # NOTE: Populate Field
 @dataclass
 class DateStartDayField(FormField):
-    index: int
+    index: int = 0
     key: str = field(init=False)
     value: str
 
@@ -122,7 +122,7 @@ class DateStartDayField(FormField):
 # NOTE: Populate Field
 @dataclass
 class DateStartYearField(FormField):
-    index: int
+    index: int = 0
     key: str = field(init=False)
     value: str
 
@@ -133,7 +133,7 @@ class DateStartYearField(FormField):
 # NOTE: Populate Field
 @dataclass
 class DateStartHourField(FormField):
-    index: int
+    index: int = 0
     key: str = field(init=False)
     value: str
 
@@ -144,7 +144,7 @@ class DateStartHourField(FormField):
 # NOTE: Populate Field
 @dataclass
 class DateStartMinuteField(FormField):
-    index: int
+    index: int = 0
     key: str = field(init=False)
     value: str
 
@@ -155,7 +155,7 @@ class DateStartMinuteField(FormField):
 # NOTE: Populate Field
 @dataclass
 class DateStartAmPmField(FormField):
-    index: int
+    index: int = 0
     key: str = field(init=False)
     value: Literal["am", "pm"]
 
@@ -166,7 +166,7 @@ class DateStartAmPmField(FormField):
 # NOTE: Populate Field
 @dataclass
 class DateEndMonthField(FormField):
-    index: int
+    index: int = 0
     key: str = field(init=False)
     value: str
 
@@ -177,7 +177,7 @@ class DateEndMonthField(FormField):
 # NOTE: Populate Field
 @dataclass
 class DateEndDayField(FormField):
-    index: int
+    index: int = 0
     key: str = field(init=False)
     value: str
 
@@ -188,7 +188,7 @@ class DateEndDayField(FormField):
 # NOTE: Populate Field
 @dataclass
 class DateEndYearField(FormField):
-    index: int
+    index: int = 0
     key: str = field(init=False)
     value: str
 
@@ -199,7 +199,7 @@ class DateEndYearField(FormField):
 # NOTE: Populate Field
 @dataclass
 class DateEndHourField(FormField):
-    index: int
+    index: int = 0
     key: str = field(init=False)
     value: str
 
@@ -210,7 +210,7 @@ class DateEndHourField(FormField):
 # NOTE: Populate Field
 @dataclass
 class DateEndMinuteField(FormField):
-    index: int
+    index: int = 0
     key: str = field(init=False)
     value: str
 
@@ -221,7 +221,7 @@ class DateEndMinuteField(FormField):
 # NOTE: Populate Field
 @dataclass
 class DateEndAmPmField(FormField):
-    index: int
+    index: int = 0
     key: str = field(init=False)
     value: Literal["am", "pm"]
 
@@ -232,7 +232,7 @@ class DateEndAmPmField(FormField):
 # NOTE: Populate Field
 @dataclass
 class DateStatusField(FormField):
-    index: int
+    index: int = 0
     key: str = field(init=False)
     value: Literal["_none", "On Hold", "Postponed", "Canceled", "Ongoing"] = "_none"
 
@@ -244,7 +244,7 @@ class DateStatusField(FormField):
 
 @dataclass
 class DateDetailsField(FormField):
-    index: int
+    index: int = 0
     key: str = field(init=False)
     value: Literal["_none", "On Hold", "Postponed", "Canceled", "Ongoing"] = "_none"
 
@@ -255,7 +255,7 @@ class DateDetailsField(FormField):
 # NOTE: Update after class
 @dataclass
 class DateTotalAdults(FormField):
-    index: int
+    index: int = 0
     key: str = field(init=False)
     value: Optional[int | str] = ""
 
@@ -266,7 +266,7 @@ class DateTotalAdults(FormField):
 
 @dataclass
 class DateTotalYoungAdults(FormField):
-    index: int
+    index: int = 0
     key: str = field(init=False)
     value: Optional[int | str] = ""
 
@@ -277,7 +277,7 @@ class DateTotalYoungAdults(FormField):
 
 @dataclass
 class DateTotalChildren(FormField):
-    index: int
+    index: int = 0
     key: str = field(init=False)
     value: Optional[int | str] = ""
 
@@ -288,7 +288,7 @@ class DateTotalChildren(FormField):
 
 @dataclass
 class DateWeightHidden(FormField):
-    index: int
+    index: int = 0
     key: str = field(init=False)
     value: str = "0"
 
@@ -299,7 +299,7 @@ class DateWeightHidden(FormField):
 # NOTE: Populate Field
 @dataclass
 class LocationField(FormField):
-    index: int
+    index: int = 0
     key: str = field(init=False)
     value: int | Literal["_none"]
 
@@ -312,7 +312,7 @@ class LocationField(FormField):
 # NOTE: Populate Field
 @dataclass
 class ExternalLocationField(FormField):
-    index: int
+    index: int = 0
     key: str = field(init=False)
     value: Optional[str] = ""
 
@@ -322,7 +322,7 @@ class ExternalLocationField(FormField):
 
 @dataclass
 class LocationWeightHidden(FormField):
-    index: int
+    index: int = 0
     key: str = field(init=False)
     value: str = "0"
 

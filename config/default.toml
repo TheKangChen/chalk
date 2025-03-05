@@ -1,0 +1,18 @@
+[google_api]
+scopes = [
+    "https://www.googleapis.com/auth/spreadsheets.readonly",
+    "https://mail.google.com/",
+    "https://www.googleapis.com/auth/calendar.events.owned"
+]
+
+[google_api.credentials]
+dir = "./credentials"
+path = "./credentials/credentials.json"
+token_path = "./credentials/token.json"
+
+[logs]
+dir = "./run_logs"
+
+[config]
+dir = "./config"
+default_conf = "./config/default.toml"

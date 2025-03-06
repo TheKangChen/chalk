@@ -7,6 +7,9 @@
 # Logs
 run_logs/
 
+# Database
+chalk_schedule.sqlite
+
 # Secrets & credentials
 secrets/
 credentials/

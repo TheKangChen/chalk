@@ -32,6 +32,10 @@ CREATE TABLE "main" (
   "person" TEXT NOT NULL,
   "email" TEXT NOT NULL,
   "invite_sent" INTEGER,
+  "drupal_link" TEXT,
+  "zoom_link" TEXT,
+  "zoom_meeting_id" TEXT,
+  "zoom_meeting_passcode" TEXT,
   CHECK (
     date LIKE '____-__-__ __:__:__'
     AND SUBSTR(date, 6, 2) BETWEEN '01' AND '12'
@@ -62,4 +66,14 @@ CREATE TABLE "main" (
   FOREIGN KEY ("library_name") REFERENCES "library_names" ("name"),
   FOREIGN KEY ("external_location") REFERENCES "external_locations" ("name"),
   FOREIGN KEY ("status") REFERENCES "status" ("value")
+);
+
+-- Classes table
+CREATE TABLE "classes" (
+  "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  "title" TEXT NOT NULL,
+  "zh_title" TEXT,
+  "description" TEXT NOT NULL,
+  "zh_description" TEXT,
+  UNIQUE ("id", "title", "zh_title")
 );

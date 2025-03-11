@@ -15,6 +15,7 @@ dependencies = [
     "google-auth-oauthlib",
     "playwright",
     "pytz",
+    "rich",
 ]
 
 [project.scripts]

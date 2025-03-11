@@ -5,7 +5,7 @@ import httpx
 from chalk.classes.models import VirtualClassInfo
 
 
-def get_csv(virtual_class: VirtualClassInfo, client: httpx.Client) -> None:
+def get_registration_csv(virtual_class: VirtualClassInfo, client: httpx.Client) -> None:
     resp = client.get(virtual_class.drupal_link).raise_for_status()
     match = re.search(r"/node/(\d+)/registrations", resp.text)
 

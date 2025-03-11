@@ -15,7 +15,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 from chalk.classes.auth import get_login_client
-from chalk.classes.fetch import get_csv, get_registration_emails
+from chalk.classes.fetch import get_registration_csv, get_registration_emails
 from chalk.classes.models import VirtualClassInfo
 from chalk.google_api.apps import GoogleService, get_service
 from chalk.google_api.auth import authorize_google
@@ -227,7 +227,7 @@ def main() -> None:
         # get registration emails from drupal
         if classes:
             for _class in classes:
-                get_csv(_class, client)
+                get_registration_csv(_class, client)
                 get_registration_emails(_class)
                 print(_class.registration_emails)
 

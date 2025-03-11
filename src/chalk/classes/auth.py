@@ -3,6 +3,8 @@ from bs4 import BeautifulSoup
 
 
 def get_login_client(username: str, password: str, login_url: str) -> httpx.Client:
+    """Log into url with http client and return the client"""
+
     client = httpx.Client()
     resp = client.get(login_url).raise_for_status()
     form_build_id = (

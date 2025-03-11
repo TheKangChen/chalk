@@ -5,7 +5,7 @@
 .venv/
 
 # schedules
-????_??.csv
+[0-9][0-9][0-9][0-9]_[0-9][0-9].csv
 
 # active classes
 active_classes.csv

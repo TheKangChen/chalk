@@ -13,6 +13,13 @@ token_path = "./credentials/token.json"
 [logs]
 dir = "./run_logs"
 
+[db]
+path = "./db/chalk_schedule.sqlite"
+
 [config]
 dir = "./config"
 default_conf = "./config/default.toml"
+
+[schedule]
+dir = "./config/schedule"
+active_classes = "./config/schedule/active_classes.csv"

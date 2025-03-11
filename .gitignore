@@ -4,6 +4,12 @@
 # virtual env
 .venv/
 
+# schedules
+????_??.csv
+
+# active classes
+active_classes.csv
+
 # Logs
 run_logs/
 

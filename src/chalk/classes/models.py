@@ -960,13 +960,41 @@ class WorkflowDisclaimerField(FormField):
     value: str = ""
 
 
-DRUPAL_EVENT_FILE_DEFAULT = {
+@dataclass
+class SaveFormButton(FormField):
+    key: str = "op"
+    value: Literal["Save", "Preview"] = "Save"
+
+
+DRUPAL_EVENT_MENU_SETTINGS = {
     "menu[link_title]": (None, ""),
     "menu[description]": (None, ""),
     "menu[parent]": (None, "main-menu:0"),
     "menu[weight]": (None, "0"),
+}
+
+
+DRUPAL_EVENT_REVISION_INFO = {
     "log": (None, ""),
+}
+
+
+DRUPAL_EVENT_PATH_SETTINGS = {
     "path[alias]": (None, ""),
+}
+
+
+DRUPAL_EVENT_COMMENT_SETTINGS = {
+    "comment": (None, "1"),  # Values: {"Closed": "1", "Open": "2"}
+}
+
+
+DRUPAL_EVENT_ADDITIONAL_SETTINGS = {
+    "additional_settings__active_tab": (None, "edit-menu"),  # Values: "edit-revision-information", "edit-path", "edit-metatags", "edit-comment-settings"
+}
+
+
+DRUPAL_EVENT_META_TAGS = {
     "metatags[und][title][value]": (None, "[node:title] | [site:name]"),
     "metatags[und][title][default]": (None, "[node:title] | [site:name]"),
     "metatags[und][description][value]": (None, "[node:summary]"),
@@ -1235,7 +1263,4 @@ DRUPAL_EVENT_FILE_DEFAULT = {
     "metatags[und][twitter:label2][default]": (None, ""),
     "metatags[und][twitter:data2][value]": (None, ""),
     "metatags[und][twitter:data2][default]": (None, ""),
-    "comment": (None, "1"),
-    "additional_settings__active_tab": (None, "edit-menu"),
-    "op": (None, "Save"),
 }

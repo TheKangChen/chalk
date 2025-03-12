@@ -1264,3 +1264,5 @@ DRUPAL_EVENT_META_TAGS = {
     "metatags[und][twitter:data2][value]": (None, ""),
     "metatags[und][twitter:data2][default]": (None, ""),
 }
+
+

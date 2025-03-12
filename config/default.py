@@ -1,3 +1,7 @@
+from pathlib import Path
+
+BASE_DIR = Path(__file__).parent.parent
+
 # google api scopes
 GOOGLE_API_SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets.readonly",
@@ -6,20 +10,21 @@ GOOGLE_API_SCOPES = [
 ]
 
 # google api tokens
-CRED_DIR = "./credentials"
-CRED_PATH = f"{CRED_DIR}/credentials.json"
-TOKEN_PATH = f"{CRED_DIR}/token.json"
+CRED_DIR = BASE_DIR / "credentials"
+CRED_PATH = CRED_DIR / "credentials.json"
+TOKEN_PATH = CRED_DIR / "token.json"
 
 # logs directory
-LOG_DIR = "./run_logs"
+LOG_DIR = BASE_DIR / "run_logs"
 
 # database
-DB_PATH = "./db/chalk_schedule.sqlite"
+DB_DIR = BASE_DIR / "db"
+DB_PATH = DB_DIR / "chalk_schedule.sqlite"
 
 # config default directory
-CONFIG_DIR = "./config"
-DEFAULT_CONF = f"{CONFIG_DIR}/default.py"
+CONFIG_DIR = BASE_DIR / "config"
+DEFAULT_CONF = CONFIG_DIR / "default.py"
 
 # schedule & active classes csv directory
-SCHEDULE_DIR = f"{CONFIG_DIR}/schedule"
-ACTIVE_CLASSES = f"{CONFIG_DIR}/schedule/active_classes.csv"
+SCHEDULE_DIR = CONFIG_DIR / "schedule"
+ACTIVE_CLASSES = SCHEDULE_DIR / "active_classes.csv"

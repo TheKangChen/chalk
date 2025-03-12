@@ -13,11 +13,12 @@ class SQLiteConnection:
         self._conn = sqlite3.connect(database)
         self._cursor = self._conn.cursor()
 
-    def __enter__(self):
+    def __enter__(self) -> "SQLiteConnection":
         return self
 
-    def __exit__(self, exc_type, exc_value, exc_tb):
+    def __exit__(self, exc_type, exc_value, exc_tb) -> None:
         try:
+            self.remove_duplicates()
             self.close()
         except Exception as e:
             logger.error(f"Error closing connection: {e}")
@@ -36,7 +37,7 @@ class SQLiteConnection:
         sql = f"SELECT '{table_name}' FROM sqlite_master WHERE type='table' AND name='{table_name}';"
         try:
             self.cursor.execute(sql)
-            return self.cursor.fetchone() is not None  # type: ignore
+            return self.cursor.fetchone() is not None
         except Exception as e:
             logger.error(f"Error checking table existence: {e}")
             raise
@@ -95,3 +96,45 @@ class SQLiteConnection:
 
     def rollback(self) -> None:
         self.connection.rollback()
+
+    def remove_duplicates(self, table_name: str = None) -> None:
+        """Removes duplicate rows from the specified table. If no table name is given, removes duplicates from all tables."""
+        try:
+            if table_name:
+                self._remove_duplicates_single_table(table_name)
+            else:
+                self.cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+                tables = [table[0] for table in self.cursor.fetchall()]
+                for table in tables:
+                    self._remove_duplicates_single_table(table)
+            self.commit()
+        except Exception as e:
+            logger.error(f"Error removing duplicates: {e}")
+            self.rollback()
+            raise
+
+    def _remove_duplicates_single_table(self, table_name: str) -> None:
+    """Helper method to remove duplicates from a single table."""
+    try:
+        # Get the column names
+        self.cursor.execute(f"PRAGMA table_info({table_name});")
+        columns = [column[1] for column in self.cursor.fetchall()]
+
+        # Construct the GROUP BY clause
+        group_by_clause = ", ".join(columns)
+
+        sql = f"""
+            DELETE FROM {table_name}
+            WHERE rowid NOT IN (
+                SELECT min(rowid)
+                FROM {table_name}
+                GROUP BY {group_by_clause}
+            );
+        """
+        self.execute(sql)
+        logger.info(f"Duplicates removed from table: {table_name}")
+    except sqlite3.OperationalError as e:
+      if "no columns to group" in str(e):
+        logger.info(f"Table {table_name} has no columns, or is empty, so skipping duplicate removal")
+      else:
+        raise e

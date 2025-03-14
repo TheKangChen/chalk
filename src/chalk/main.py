@@ -28,7 +28,7 @@ from config.default import (
 # G Sheets
 SCHEDULED_DATE = datetime.date.today() + datetime.timedelta(days=1)
 # FMT_DATE = SCHEDULED_DATE.strftime("%Y/%m/%d")
-FMT_DATE = "2025/03/06"
+FMT_DATE = "2025/03/12"
 SHEET_NAME = f"{SCHEDULED_DATE.year} {SCHEDULED_DATE.strftime('%B')}"
 RANGE_NAME = SHEET_NAME + "!A1:P50"
 
